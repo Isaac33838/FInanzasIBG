@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzas Personales IBG</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+<script>
+(function(){
+  const _raw = localStorage.getItem('_ibg_billgates_raw');
+  if (_raw) { localStorage.setItem('ibg_transactions', _raw); localStorage.removeItem('_ibg_billgates_raw'); }
+})();
+</script>
+</head>
+<body>
+    <!-- Fondo animado -->
+    <div class="pattern-container"></div>
+
+    <!-- Contenido principal -->
+    <div class="main-container">
+        <header>
+            <h1><i class="fas fa-chart-pie"></i> Finanzas Personales IBG</h1>
+            <p class="subtitle">Control de ingresos y gastos</p>
+            <nav class="header-nav">
+                <button id="btn-home" class="nav-btn active">
+                    <i class="fas fa-home"></i> Inicio
+                </button>
+                <button id="btn-deudas-plan" class="nav-btn">
+                    <i class="fas fa-credit-card"></i> Plan de Deudas
+                </button>
+                <button id="btn-estadisticas" class="nav-btn">
+                    <i class="fas fa-chart-bar"></i> Estadísticas
+                </button>
+            </nav>
+        </header>
+
+        <section class="resumen">
+            <div class="resumen-tarjetas">
+                <div class="tarjeta tarjeta-ingresos">
+                    <h3>Ingresos</h3>
+                    <p class="monto" id="total-ingresos">$0.00</p>
+                </div>
+                <div class="tarjeta tarjeta-gastos">
+                    <h3>Gastos</h3>
+                    <p class="monto" id="total-gastos">$0.00</p>
+                </div>
+                <div class="tarjeta tarjeta-deudas">
+                    <h3>Deudas</h3>
+                    <p class="monto" id="total-deudas">$0.00</p>
+                </div>
+                <div class="tarjeta tarjeta-balance">
+                    <h3>Balance Neto</h3>
+                    <p class="monto" id="balance-neto">$0.00</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="formulario-seccion">
+            <h2>Agregar Transacción</h2>
+            <form id="formulario-transaccion">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <input type="text" id="descripcion" placeholder="Ej: Salario, Alquiler, Comida..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="monto">Monto ($)</label>
+                        <input type="number" id="monto" placeholder="0.00" step="0.01" min="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" required>
+                            <option value="salario">Salario</option>
+                            <option value="freelance">Freelance</option>
+                            <option value="inversion">Inversión</option>
+                            <option value="otros-ingresos">Otros Ingresos</option>
+                            <option value="alquiler">Alquiler</option>
+                            <option value="comida">Comida</option>
+                            <option value="transporte">Transporte</option>
+                            <option value="entretenimiento">Entretenimiento</option>
+                            <option value="servicios">Servicios</option>
+                            <option value="salud">Salud</option>
+                            <option value="educacion">Educación</option>
+                            <option value="otros-gastos">Otros Gastos</option>
+                            <option value="tarjeta">Tarjeta de Crédito</option>
+                            <option value="prestamo">Préstamo</option>
+                            <option value="hipoteca">Hipoteca</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo" required>
+                            <option value="ingreso">Ingreso</option>
+                            <option value="gasto">Gasto</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha">Fecha</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+                </div>
+                <div class="btn-wrapper-plus">
+                    <button type="submit" class="plusButton" aria-label="Agregar Transacción">
+                        <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                            <defs>
+                                <mask id="mask0_21_345">
+                                    <path fill="white" d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z" transform="translate(-0.25 -0.25)"/>
+                                </mask>
+                            </defs>
+                            <g mask="url(#mask0_21_345)">
+                                <path fill="currentColor" d="M14 23.75V16.25H6.5V14H14V6.5H16.5V14H24V16.25H16.5V24H14Z" transform="translate(-0.25 -0.25)"/>
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+<section class="listado">
+            <div class="historial-header">
+                <h2>Historial de Transacciones</h2>
+            </div>
+
+ <div class="filtros">
+                <div class="filtros-row">
+                    <div class="group-search">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" class="search-icon">
+                            <g>
+                                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                            </g>
+                        </svg>
+                        <input id="buscar" class="input-search" type="search" placeholder="Buscar transacción..." name="searchbar">
+                    </div>
+                    <select id="filtro-tipo">
+                         <option value="todos">Todos</option>
+                         <option value="ingreso">Ingresos</option>
+                       <option value="gasto">Gastos</option>
+                     </select>
+                    <select id="filtro-categoria">
+                        <option value="todos">Todas las categorías</option>
+                    </select>
+                    <button id="btn-orden-fecha" class="modern-btn-small btn-orden" title="Ordenar por fecha">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_4418_9801)">
+                                <path d="M14.3201 19.0698C14.3201 19.6798 13.92 20.4798 13.41 20.7898L12.0001 21.6998C10.6901 22.5098 8.87006 21.5998 8.87006 19.9798V14.6298C8.87006 13.9198 8.47006 13.0098 8.06006 12.5098L4.22003 8.46976C3.71003 7.95976 3.31006 7.05977 3.31006 6.44977V4.12976C3.31006 2.91976 4.22008 2.00977 5.33008 2.00977H18.67C19.78 2.00977 20.6901 2.91975 20.6901 4.02975V6.24976C20.6901 7.05976 20.1801 8.06976 19.6801 8.56976" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M16.07 16.5191C17.8373 16.5191 19.27 15.0865 19.27 13.3192C19.27 11.5518 17.8373 10.1191 16.07 10.1191C14.3027 10.1191 12.87 11.5518 12.87 13.3192C12.87 15.0865 14.3027 16.5191 16.07 16.5191Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M19.87 17.1191L18.87 16.1191" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_4418_9801">
+                                    <rect width="24" height="24" fill="white"/>
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </button>
+                    <button id="btn-orden-monto" class="modern-btn-small btn-orden" title="Ordenar por monto">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3V21M6 9L12 3L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <input type="hidden" id="filtro-orden-fecha" value="desc">
+                    <input type="hidden" id="filtro-orden-monto" value="none">
+<button id="btn-exportar" class="modern-btn-with-text btn-exportar">
+                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                             <polyline points="7 10 12 15 17 10"></polyline>
+                             <line x1="12" y1="15" x2="12" y2="3"></line>
+                         </svg>
+                         Exportar CSV
+                     </button>
+                     <button id="btn-exportar-todo" class="modern-btn-with-text btn-exportar-todo">
+                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                             <polyline points="7 10 12 15 17 10"></polyline>
+                             <line x1="12" y1="15" x2="12" y2="3"></line>
+                         </svg>
+                         Exportar Todo
+                     </button>
+                    <button id="btn-limpiar" class="modern-btn-with-text btn-limpiar">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                        Limpiar Todo
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabla-container">
+                <table class="historial-tabla">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Categoría</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-transacciones-body"></tbody>
+                </table>
+            </div>
+
+            <div id="sin-transacciones-mensaje" class="sin-transacciones">
+                <p>No hay transacciones registradas. ¡Comienza agregando una!</p>
+            </div>
+        </section>
+
+        <!-- Sección: Estadísticas -->
+        <section id="seccion-estadisticas" class="estadisticas hidden">
+            <h2>📈 Estadísticas</h2>
+            <p class="estadisticas-intro">Visualiza tus patrones de gasto e ingresos.</p>
+            
+            <div class="estadisticas-grid">
+                <!-- Promedio Mensual -->
+                <div class="estadistica-card">
+                    <h3>Promedio Mensual</h3>
+                    <div class="resumen-tipos">
+                        <div class="tipo-item tipo-ingresos">
+                            <span class="tipo-label">Ingreso promedio</span>
+                            <span class="tipo-monto" id="estadistica-prom-ingreso">$0.00</span>
+                        </div>
+                        <div class="tipo-item tipo-gastos">
+                            <span class="tipo-label">Gasto promedio</span>
+                            <span class="tipo-monto" id="estadistica-prom-gasto">$0.00</span>
+                        </div>
+                        <div class="tipo-item tipo-balance">
+                            <span class="tipo-label">Balance promedio</span>
+                            <span class="tipo-monto" id="estadistica-prom-balance">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categoría con Mayor Gasto -->
+                <div class="estadistica-card">
+                    <h3>Categoría con Mayor Gasto</h3>
+                    <div class="cat-mayor-content">
+                        <span class="tipo-label">Categoría</span>
+                        <span class="cat-mayor-nombre" id="cat-mayor-nombre">—</span>
+                        <div class="cat-mayor-barra-outer">
+                            <div class="cat-mayor-barra" id="cat-mayor-barra"></div>
+                        </div>
+                        <div class="cat-mayor-pie">
+                            <span class="tipo-monto" id="cat-mayor-monto">$0.00</span>
+                            <span class="cat-mayor-pct" id="cat-mayor-pct">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Plan de Deudas -->
+        <section id="seccion-plan-deudas" class="plan-deudas hidden">
+            <h2>📊 Planificador de Deudas</h2>
+            <p class="plan-intro">Organiza y visualiza cómo pagar tus deudas de manera inteligente.</p>
+            
+            <div class="plan-formulario">
+                <h3>Agregar Deuda al Plan</h3>
+                <form id="formulario-plan-deuda">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="plan-nombre">Nombre de la Deuda</label>
+                            <input type="text" id="plan-nombre" placeholder="Ej: Tarjeta Visa, Préstamo Auto..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="plan-monto">Monto Total ($)</label>
+                            <input type="number" id="plan-monto" placeholder="0.00" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="plan-tasa">Tasa de Interés Anual (%)</label>
+                            <input type="number" id="plan-tasa" placeholder="Ej: 15.5" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="plan-plazo">Plazo (meses)</label>
+                            <input type="number" id="plan-plazo" placeholder="Ej: 12" min="1" max="360" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="plan-cuota">Cuota Mensual Sugerida ($)</label>
+                            <input type="number" id="plan-cuota" placeholder="Dejar vacío para calcular automáticamente" step="0.01" min="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="plan-fecha-inicio">Fecha de Inicio</label>
+                            <input type="date" id="plan-fecha-inicio" required>
+                        </div>
+                    </div>
+                    <div class="btn-plan-container">
+                        <button type="submit" class="plusButton btn-plan" aria-label="Agregar al Plan">
+                            <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                                <defs>
+                                    <mask id="mask0_21_345">
+                                        <path fill="white" d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z" transform="translate(-0.25 -0.25)"/>
+                                    </mask>
+                                </defs>
+                                <g mask="url(#mask0_21_345)">
+                                    <path fill="currentColor" d="M14 23.75V16.25H6.5V14H14V6.5H16.5V14H24V16.25H16.5V24H14Z" transform="translate(-0.25 -0.25)"/>
+                                </g>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="plan-resultados">
+                <div class="plan-resumen">
+                    <div class="plan-card">
+                        <h4>Total Deudas Planificadas</h4>
+                        <p class="plan-monto" id="plan-total-deudas">$0.00</p>
+                    </div>
+                    <div class="plan-card">
+                        <h4>Intereses Totales</h4>
+                        <p class="plan-monto" id="plan-total-intereses">$0.00</p>
+                    </div>
+                    <div class="plan-card">
+                        <h4>Total a Pagar</h4>
+                        <p class="plan-monto" id="plan-total-pagar">$0.00</p>
+                    </div>
+                </div>
+
+                <div class="plan-tabla-container">
+                    <h3>Calendario de Pagos</h3>
+                    <div class="plan-table-wrapper">
+                        <table class="plan-tabla">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Deuda</th>
+                                    <th>Cuota</th>
+                                    <th>Interés</th>
+                                    <th>Amortización</th>
+                                    <th>Saldo</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="plan-tabla-body">
+                                <tr>
+                                    <td colspan="7" class="sin-datos">No hay deudas planificadas. Agrega una para ver el calendario.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Finanzas Personales IBG &copy; 2026 — Todos los derechos reservados</p>
+        </footer>
+    </div>
+
+    <div id="modal-editar" class="modal">
+        <div class="modal-contenido">
+            <span class="modal-cerrar" id="cerrar-modal">&times;</span>
+            <h2>Editar Transacción</h2>
+            <form id="formulario-editar">
+                <input type="hidden" id="editar-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editar-descripcion">Descripción</label>
+                        <input type="text" id="editar-descripcion" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editar-monto">Monto ($)</label>
+                        <input type="number" id="editar-monto" step="0.01" min="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editar-categoria">Categoría</label>
+                        <select id="editar-categoria" required>
+                            <option value="salario">Salario</option>
+                            <option value="freelance">Freelance</option>
+                            <option value="inversion">Inversión</option>
+                            <option value="otros-ingresos">Otros Ingresos</option>
+                            <option value="alquiler">Alquiler</option>
+                            <option value="comida">Comida</option>
+                            <option value="transporte">Transporte</option>
+                            <option value="entretenimiento">Entretenimiento</option>
+                            <option value="servicios">Servicios</option>
+                            <option value="salud">Salud</option>
+                            <option value="educacion">Educación</option>
+                            <option value="otros-gastos">Otros Gastos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editar-tipo">Tipo</label>
+                        <select id="editar-tipo" required>
+                            <option value="ingreso">Ingreso</option>
+                            <option value="gasto">Gasto</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editar-fecha">Fecha</label>
+                        <input type="date" id="editar-fecha" required>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-guardar">Guardar Cambios</button>
+                    <button type="button" id="btn-cancelar" class="btn-cancelar-modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
